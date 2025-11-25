@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار متغيرات البيئة - OrgaFlow36</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h1 class="text-3xl font-bold text-indigo-600 mb-6 text-center">
+                🔍 اختبار متغيرات البيئة - OrgaFlow36
+            </h1>
+
+            <div class="space-y-4">
+                <!-- Test 1: Environment Variables -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-800">
+                        1️⃣ متغيرات البيئة
+                    </h2>
+                    <div id="env-results" class="space-y-2"></div>
+                </div>
+
+                <!-- Test 2: Supabase Connection -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-800">
+                        2️⃣ اختبار الاتصال بـ Supabase
+                    </h2>
+                    <button 
+                        onclick="testSupabase()" 
+                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition"
+                    >
+                        اختبار الاتصال
+                    </button>
+                    <div id="supabase-results" class="mt-3"></div>
+                </div>
+
+                <!-- Test 3: Build Info -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h2 class="text-xl font-semibold mb-3 text-gray-800">
+                        3️⃣ معلومات البناء
+                    </h2>
+                    <div id="build-info" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 class="font-semibold text-blue-800 mb-2">📝 ملاحظات:</h3>
+                <ul class="list-disc list-inside text-blue-700 space-y-1 text-sm">
+                    <li>إذا كانت متغيرات البيئة "undefined"، يجب إضافتها في Netlify</li>
+                    <li>يجب أن تبدأ جميع المتغيرات بـ <code class="bg-blue-100 px-1 rounded">VITE_</code></li>
+                    <li>بعد إضافة المتغيرات، يجب إعادة النشر (Redeploy)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Test 1: Check Environment Variables
+        function checkEnvVariables() {
+            const envResults = document.getElementById('env-results');
+            const vars = {
+                'VITE_SUPABASE_URL': import.meta.env.VITE_SUPABASE_URL,
+                'VITE_SUPABASE_ANON_KEY': import.meta.env.VITE_SUPABASE_ANON_KEY,
+                'GEMINI_API_KEY': import.meta.env.GEMINI_API_KEY
+            };
+
+            let html = '';
+            for (const [key, value] of Object.entries(vars)) {
+                const status = value ? '✅' : '❌';
+                const statusClass = value ? 'text-green-600' : 'text-red-600';
+                const displayValue = value 
+                    ? (key.includes('KEY') ? value.substring(0, 20) + '...' : value)
+                    : 'undefined';
+                
+                html += `
+                    <div class="flex items-start gap-2">
+                        <span class="${statusClass} text-xl">${status}</span>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-700">${key}</div>
+                            <div class="text-sm text-gray-600 font-mono break-all">${displayValue}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            envResults.innerHTML = html;
+        }
+
+        // Test 2: Test Supabase Connection
+        window.testSupabase = async function() {
+            const resultsDiv = document.getElementById('supabase-results');
+            resultsDiv.innerHTML = '<div class="text-gray-600">جاري الاختبار...</div>';
+
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+            if (!supabaseUrl || !supabaseKey) {
+                resultsDiv.innerHTML = `
+                    <div class="text-red-600 font-semibold">
+                        ❌ متغيرات Supabase غير موجودة!
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                // Import Supabase
+                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+                const supabase = createClient(supabaseUrl, supabaseKey);
+
+                // Test connection by fetching from a table
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('count')
+                    .limit(1);
+
+                if (error) {
+                    resultsDiv.innerHTML = `
+                        <div class="text-red-600">
+                            <div class="font-semibold">❌ فشل الاتصال</div>
+                            <div class="text-sm mt-1">الخطأ: ${error.message}</div>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div class="text-green-600 font-semibold">
+                            ✅ الاتصال بـ Supabase ناجح!
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                resultsDiv.innerHTML = `
+                    <div class="text-red-600">
+                        <div class="font-semibold">❌ خطأ في الاتصال</div>
+                        <div class="text-sm mt-1">${err.message}</div>
+                    </div>
+                `;
+            }
+        };
+
+        // Test 3: Build Info
+        function showBuildInfo() {
+            const buildInfo = document.getElementById('build-info');
+            const info = {
+                'Mode': import.meta.env.MODE,
+                'Base URL': import.meta.env.BASE_URL,
+                'Production': import.meta.env.PROD ? 'Yes' : 'No',
+                'Development': import.meta.env.DEV ? 'Yes' : 'No'
+            };
+
+            let html = '';
+            for (const [key, value] of Object.entries(info)) {
+                html += `
+                    <div class="flex gap-2">
+                        <span class="font-semibold text-gray-700">${key}:</span>
+                        <span class="text-gray-600">${value}</span>
+                    </div>
+                `;
+            }
+            buildInfo.innerHTML = html;
+        }
+
+        // Run tests on page load
+        checkEnvVariables();
+        showBuildInfo();
+    </script>
+</body>
+</html>
+
