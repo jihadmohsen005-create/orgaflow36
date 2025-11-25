@@ -41,19 +41,79 @@
 </head>
   <body>
     <div id="root">
-      <!-- Loading indicator -->
-      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; font-family: 'Cairo', sans-serif;">
-        <div style="width: 80px; height: 80px; border: 8px solid #e2e8f0; border-top: 8px solid #4f46e5; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <p style="margin-top: 20px; font-size: 18px; color: #64748b;">جاري تحميل OrgaFlow...</p>
-        <p style="margin-top: 10px; font-size: 14px; color: #94a3b8;">الرجاء الانتظار</p>
+      <!-- Diagnostic Mode: Show errors if React fails to load -->
+      <div id="diagnostic-screen" style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; font-family: 'Cairo', sans-serif; padding: 20px;">
+        <div style="max-width: 800px; width: 100%; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 30px;">
+          <h1 style="color: #4f46e5; font-size: 24px; margin-bottom: 20px; text-align: center;">🔍 وضع التشخيص - OrgaFlow36</h1>
+
+          <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            <p style="color: #92400e; font-weight: 600; margin: 0;">⚠️ إذا رأيت هذه الرسالة، فهذا يعني أن React لم يتم تحميله بنجاح.</p>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <h2 style="color: #1f2937; font-size: 18px; margin-bottom: 10px;">📋 الأسباب المحتملة:</h2>
+            <ul style="color: #4b5563; line-height: 1.8; padding-right: 20px;">
+              <li><strong>متغيرات البيئة ناقصة:</strong> VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY</li>
+              <li><strong>خطأ في JavaScript:</strong> افتح Console (F12) لرؤية الأخطاء</li>
+              <li><strong>مشكلة في البناء:</strong> راجع Build log في Vercel</li>
+            </ul>
+          </div>
+
+          <div style="background: #dbeafe; border: 2px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            <h3 style="color: #1e40af; font-size: 16px; margin-bottom: 10px;">🔧 الحل السريع:</h3>
+            <ol style="color: #1e3a8a; line-height: 1.8; padding-right: 20px;">
+              <li>اضغط <strong>F12</strong> لفتح Developer Tools</li>
+              <li>اذهب إلى تبويب <strong>"Console"</strong></li>
+              <li>ابحث عن رسائل خطأ باللون الأحمر</li>
+              <li>انسخ رسالة الخطأ وأرسلها للمطور</li>
+            </ol>
+          </div>
+
+          <div id="error-display" style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 15px; display: none;">
+            <h3 style="color: #991b1b; font-size: 16px; margin-bottom: 10px;">❌ أخطاء JavaScript:</h3>
+            <pre id="error-content" style="color: #7f1d1d; font-size: 12px; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;"></pre>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px;">
+            <p style="color: #6b7280; font-size: 14px;">للمساعدة، راجع ملف: <code style="background: #f3f4f6; padding: 2px 6px; border-radius: 4px;">DIAGNOSE_NOW.md</code></p>
+          </div>
+        </div>
       </div>
-      <style>
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      </style>
     </div>
+
+    <!-- Error Capture Script -->
+    <script>
+      // Capture JavaScript errors and display them
+      window.addEventListener('error', function(event) {
+        const errorDisplay = document.getElementById('error-display');
+        const errorContent = document.getElementById('error-content');
+        if (errorDisplay && errorContent) {
+          errorDisplay.style.display = 'block';
+          errorContent.textContent += '\n' + event.message + '\n  at ' + event.filename + ':' + event.lineno + ':' + event.colno;
+        }
+        console.error('Error captured:', event.message, event.filename, event.lineno, event.colno);
+      });
+
+      // Capture unhandled promise rejections
+      window.addEventListener('unhandledrejection', function(event) {
+        const errorDisplay = document.getElementById('error-display');
+        const errorContent = document.getElementById('error-content');
+        if (errorDisplay && errorContent) {
+          errorDisplay.style.display = 'block';
+          errorContent.textContent += '\n[Promise Rejection] ' + event.reason;
+        }
+        console.error('Unhandled promise rejection:', event.reason);
+      });
+
+      // Check if React loaded after 3 seconds
+      setTimeout(function() {
+        const diagnosticScreen = document.getElementById('diagnostic-screen');
+        if (diagnosticScreen && diagnosticScreen.parentElement) {
+          console.warn('React did not load within 3 seconds. Check Console for errors.');
+        }
+      }, 3000);
+    </script>
+
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>
