@@ -1,0 +1,187 @@
+{
+  "metadata": {
+    "exportDate": "2025-01-25T10:30:00.000Z",
+    "version": "1.0",
+    "tables": 84,
+    "note": "هذا مثال مبسط - الملف الحقيقي يحتوي على 84 جدول"
+  },
+  "data": {
+    "users": [
+      {
+        "id": "11111111-1111-1111-1111-111111111111",
+        "username": "director",
+        "password": "123",
+        "role_id": "exec_director",
+        "name": "Executive Director",
+        "created_at": "2025-01-25T08:00:00.000Z",
+        "updated_at": "2025-01-25T08:00:00.000Z"
+      },
+      {
+        "id": "22222222-2222-2222-2222-222222222222",
+        "username": "finance",
+        "password": "123",
+        "role_id": "finance_manager",
+        "name": "Finance Manager",
+        "created_at": "2025-01-25T08:00:00.000Z",
+        "updated_at": "2025-01-25T08:00:00.000Z"
+      },
+      {
+        "id": "33333333-3333-3333-3333-333333333333",
+        "username": "procurement",
+        "password": "123",
+        "role_id": "procurement_officer",
+        "name": "Procurement Officer",
+        "created_at": "2025-01-25T08:00:00.000Z",
+        "updated_at": "2025-01-25T08:00:00.000Z"
+      }
+    ],
+    "roles": [
+      {
+        "id": "exec_director",
+        "name_ar": "مدير تنفيذي",
+        "name_en": "Executive Director",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      },
+      {
+        "id": "finance_manager",
+        "name_ar": "مدير مالي",
+        "name_en": "Finance Manager",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      },
+      {
+        "id": "procurement_officer",
+        "name_ar": "موظف مشتريات",
+        "name_en": "Procurement Officer",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      }
+    ],
+    "suppliers": [
+      {
+        "id": "00011111-1111-1111-1111-111111111111",
+        "name_ar": "شركة ألفا للتوريدات",
+        "name_en": "Alpha Supplies Co.",
+        "phone": "0501234567",
+        "phone2": "",
+        "address": "الرياض",
+        "licensed_dealer": "1010123456",
+        "type_id": "1f5e6ed0-252a-492f-83d1-289b5ef645b9",
+        "email": "info@alpha.com",
+        "authorized_person": "أحمد محمود",
+        "chairman": "خالد عبدالله",
+        "id_number": "1234567890",
+        "business_id": "021152f1-3c1a-4dfc-bbfb-9699d105c6f4",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      },
+      {
+        "id": "00022222-2222-2222-2222-222222222222",
+        "name_ar": "مؤسسة بيتا التجارية",
+        "name_en": "Beta Trading Est.",
+        "phone": "0557654321",
+        "phone2": "",
+        "address": "جدة",
+        "licensed_dealer": "1010654321",
+        "type_id": "1f5e6ed0-252a-492f-83d1-289b5ef645b9",
+        "email": "contact@beta.com",
+        "authorized_person": "فاطمة علي",
+        "chairman": "سارة إبراهيم",
+        "id_number": "0987654321",
+        "business_id": "bb16adeb-389a-4e2c-9d40-d89c405c0839",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      }
+    ],
+    "items": [
+      {
+        "id": "i0001111-1111-1111-1111-111111111111",
+        "category_id": "f759bd69-2228-4df4-badd-d5bfa92db0c9",
+        "name_ar": "جهاز حاسوب محمول",
+        "name_en": "Laptop Computer",
+        "description_ar": "مواصفات قياسية",
+        "description_en": "Standard specifications",
+        "unit": "قطعة",
+        "estimated_price": 1000,
+        "currency": "USD",
+        "notes": "",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      },
+      {
+        "id": "i0002222-2222-2222-2222-222222222222",
+        "category_id": "ce146e94-d9f4-4fea-95d6-7c5dcb8bb528",
+        "name_ar": "ورق طباعة A4",
+        "name_en": "A4 Printing Paper",
+        "description_ar": "حزمة 500 ورقة",
+        "description_en": "Pack of 500 sheets",
+        "unit": "حزمة",
+        "estimated_price": 5,
+        "currency": "USD",
+        "notes": "",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      }
+    ],
+    "projects": [
+      {
+        "id": "proj0001-1111-1111-1111-111111111111",
+        "project_code": "PRJ-2025-001",
+        "name_ar": "مشروع التنمية المجتمعية",
+        "name_en": "Community Development Project",
+        "donor_id": "d0000111-1111-1111-1111-111111111111",
+        "start_date": "2025-01-01",
+        "end_date": "2025-12-31",
+        "budget": 100000,
+        "currency": "USD",
+        "status": "active",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      }
+    ],
+    "purchase_requests": [
+      {
+        "id": "pr000001-1111-1111-1111-111111111111",
+        "request_number": "PR-2025-001",
+        "request_date": "2025-01-20",
+        "requester_id": "33333333-3333-3333-3333-333333333333",
+        "department_id": "dept0001-1111-1111-1111-111111111111",
+        "project_id": "proj0001-1111-1111-1111-111111111111",
+        "status": "pending",
+        "total_amount": 5000,
+        "currency": "USD",
+        "notes": "طلب شراء أجهزة حاسوب",
+        "created_at": "2025-01-20T10:00:00.000Z"
+      }
+    ],
+    "organization_info": [
+      {
+        "id": 1,
+        "name_ar": "OrgaFlow",
+        "name_en": "OrgaFlow",
+        "abbreviation": "TA",
+        "establishment_date": "2023-01-01",
+        "license_number": "RA-123-B",
+        "phone": "08-282-5333",
+        "mobile": "059-555-3348",
+        "fax": "08-282-5333",
+        "email": "info@orgaflow.ps",
+        "address": "Gaza, Palestine",
+        "website": "www.orgaflow.ps",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      }
+    ],
+    "approval_workflow": [
+      {
+        "step_order": 1,
+        "role_id": "procurement_officer",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      },
+      {
+        "step_order": 2,
+        "role_id": "finance_manager",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      },
+      {
+        "step_order": 3,
+        "role_id": "exec_director",
+        "created_at": "2025-01-25T08:00:00.000Z"
+      }
+    ]
+  },
+  "_comment": "ملاحظة: هذا مثال مبسط يحتوي على 7 جداول فقط. الملف الحقيقي يحتوي على 84 جدول بما في ذلك: contracts, employees, board_meetings, fuel_types, warehouses, assets, وغيرها الكثير."
+}
+

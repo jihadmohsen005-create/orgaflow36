@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تشخيص Supabase Storage</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #252526;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        h1 {
+            color: #4ec9b0;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+        .test {
+            background: #1e1e1e;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #569cd6;
+            border-radius: 5px;
+        }
+        .test h3 {
+            color: #569cd6;
+            margin-top: 0;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        .log {
+            background: #1e1e1e;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 5px;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        .info { color: #dcdcaa; }
+        .warning { color: #ce9178; }
+        input[type="file"] {
+            margin: 10px 0;
+            padding: 10px;
+            background: #3c3c3c;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #d4d4d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 تشخيص Supabase Storage</h1>
+
+        <div class="test">
+            <h3>1️⃣ اختبار الاتصال بـ Supabase</h3>
+            <button onclick="testConnection()">اختبار الاتصال</button>
+            <div class="log" id="log1"></div>
+        </div>
+
+        <div class="test">
+            <h3>2️⃣ اختبار الوصول إلى Bucket</h3>
+            <button onclick="testBucketAccess()">اختبار Bucket</button>
+            <div class="log" id="log2"></div>
+        </div>
+
+        <div class="test">
+            <h3>3️⃣ اختبار رفع ملف صغير (نص)</h3>
+            <button onclick="testTextUpload()">رفع ملف نصي</button>
+            <div class="log" id="log3"></div>
+        </div>
+
+        <div class="test">
+            <h3>4️⃣ اختبار رفع ملف حقيقي</h3>
+            <input type="file" id="realFile" accept="*/*">
+            <button onclick="testRealUpload()">رفع الملف</button>
+            <div class="log" id="log4"></div>
+        </div>
+
+        <div class="test">
+            <h3>5️⃣ عرض جميع الملفات</h3>
+            <button onclick="listFiles()">عرض الملفات</button>
+            <div class="log" id="log5"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        const { createClient } = supabase;
+
+        window.supabaseClient = createClient(
+            'https://dihtjatqgwyyuvilacdd.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpaHRqYXRxZ3d5eXV2aWxhY2RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTc0MDMsImV4cCI6MjA3OTU5MzQwM30.Ck7mKYM5g44SF4S3JkIjqpOWx6u582R9KCxqGLaIJ9A'
+        );
+
+        function log(id, msg, type = 'info') {
+            const el = document.getElementById(id);
+            const time = new Date().toLocaleTimeString('ar-SA');
+            const className = type;
+            el.innerHTML += `<div class="${className}">[${time}] ${msg}</div>`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        window.testConnection = async function() {
+            const id = 'log1';
+            document.getElementById(id).innerHTML = '';
+            
+            try {
+                log(id, '🔄 جاري الاتصال بـ Supabase...', 'info');
+                
+                const { data, error } = await window.supabaseClient
+                    .from('users')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                log(id, '✅ الاتصال ناجح!', 'success');
+                log(id, `📊 البيانات: ${JSON.stringify(data)}`, 'info');
+            } catch (error) {
+                log(id, `❌ فشل الاتصال: ${error.message}`, 'error');
+                console.error(error);
+            }
+        };
+
+        window.testBucketAccess = async function() {
+            const id = 'log2';
+            document.getElementById(id).innerHTML = '';
+            
+            try {
+                log(id, '🔄 جاري فحص bucket "attachments"...', 'info');
+                
+                const { data, error } = await window.supabaseClient.storage
+                    .from('attachments')
+                    .list('', { limit: 5 });
+                
+                if (error) throw error;
+                
+                log(id, '✅ Bucket موجود ويمكن الوصول إليه!', 'success');
+                log(id, `📁 عدد العناصر: ${data.length}`, 'info');
+                data.forEach(item => {
+                    log(id, `  - ${item.name}`, 'info');
+                });
+            } catch (error) {
+                log(id, `❌ خطأ: ${error.message}`, 'error');
+                log(id, `📋 التفاصيل: ${JSON.stringify(error, null, 2)}`, 'warning');
+                console.error(error);
+            }
+        };
+
+        window.testTextUpload = async function() {
+            const id = 'log3';
+            document.getElementById(id).innerHTML = '';
+            
+            try {
+                log(id, '🔄 جاري إنشاء ملف نصي...', 'info');
+                
+                const content = `مرحباً من OrgaFlow36!\nالوقت: ${new Date().toLocaleString('ar-SA')}`;
+                const blob = new Blob([content], { type: 'text/plain' });
+                const fileName = `test-${Date.now()}.txt`;
+                const filePath = `diagnose/${fileName}`;
+                
+                log(id, `📝 اسم الملف: ${filePath}`, 'info');
+                log(id, `📊 حجم الملف: ${blob.size} bytes`, 'info');
+                log(id, '⏳ جاري الرفع...', 'warning');
+                
+                const { data, error } = await window.supabaseClient.storage
+                    .from('attachments')
+                    .upload(filePath, blob);
+                
+                if (error) throw error;
+                
+                log(id, '✅ تم رفع الملف بنجاح!', 'success');
+                log(id, `📁 المسار: ${data.path}`, 'success');
+                
+                const { data: { publicUrl } } = window.supabaseClient.storage
+                    .from('attachments')
+                    .getPublicUrl(filePath);
+                
+                log(id, `🔗 الرابط: ${publicUrl}`, 'info');
+            } catch (error) {
+                log(id, `❌ فشل الرفع: ${error.message}`, 'error');
+                log(id, `📋 التفاصيل: ${JSON.stringify(error, null, 2)}`, 'warning');
+                console.error(error);
+            }
+        };
+
+        window.testRealUpload = async function() {
+            const id = 'log4';
+            document.getElementById(id).innerHTML = '';
+            
+            const fileInput = document.getElementById('realFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                log(id, '⚠️ الرجاء اختيار ملف أولاً', 'warning');
+                return;
+            }
+            
+            try {
+                log(id, `📁 الملف: ${file.name}`, 'info');
+                log(id, `📊 الحجم: ${file.size} bytes (${(file.size/1024).toFixed(2)} KB)`, 'info');
+                log(id, `📝 النوع: ${file.type}`, 'info');
+                log(id, '⏳ جاري الرفع...', 'warning');
+                
+                const sanitized = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const fileName = `real-${Date.now()}-${sanitized}`;
+                const filePath = `diagnose/${fileName}`;
+                
+                const { data, error } = await window.supabaseClient.storage
+                    .from('attachments')
+                    .upload(filePath, file);
+                
+                if (error) throw error;
+                
+                log(id, '✅ تم رفع الملف بنجاح!', 'success');
+                log(id, `📁 المسار: ${data.path}`, 'success');
+            } catch (error) {
+                log(id, `❌ فشل الرفع: ${error.message}`, 'error');
+                log(id, `📋 التفاصيل: ${JSON.stringify(error, null, 2)}`, 'warning');
+                console.error(error);
+            }
+        };
+
+        window.listFiles = async function() {
+            const id = 'log5';
+            document.getElementById(id).innerHTML = '';
+            
+            try {
+                log(id, '🔄 جاري جلب قائمة الملفات...', 'info');
+                
+                const { data, error } = await window.supabaseClient.storage
+                    .from('attachments')
+                    .list('', { limit: 100 });
+                
+                if (error) throw error;
+                
+                log(id, `📁 عدد العناصر: ${data.length}`, 'success');
+                data.forEach(item => {
+                    log(id, `  - ${item.name} (${item.id ? 'ملف' : 'مجلد'})`, 'info');
+                });
+            } catch (error) {
+                log(id, `❌ خطأ: ${error.message}`, 'error');
+                console.error(error);
+            }
+        };
+    </script>
+</body>
+</html>
+

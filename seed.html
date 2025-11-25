@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Seed Data - OrgaFlow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <h1 class="text-4xl font-bold text-center text-indigo-600 mb-2">🌱 إضافة بيانات تجريبية</h1>
+            <p class="text-center text-gray-600 mb-8">Seed Data for OrgaFlow</p>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <p class="text-yellow-800">
+                    <strong>⚠️ تحذير:</strong> هذا السكريبت سيضيف بيانات تجريبية إلى قاعدة البيانات مع مرفقات فعلية.
+                </p>
+            </div>
+
+            <div class="space-y-4 mb-8">
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <span class="text-2xl">📋</span>
+                    <div>
+                        <h3 class="font-semibold">السياسات والأدلة</h3>
+                        <p class="text-sm text-gray-600">3 سجلات مع ملفات PDF</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <span class="text-2xl">✉️</span>
+                    <div>
+                        <h3 class="font-semibold">المراسلات</h3>
+                        <p class="text-sm text-gray-600">3 سجلات (صادر ووارد) مع ملفات PDF</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <span class="text-2xl">🏢</span>
+                    <div>
+                        <h3 class="font-semibold">الأقسام</h3>
+                        <p class="text-sm text-gray-600">5 أقسام</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <span class="text-2xl">💰</span>
+                    <div>
+                        <h3 class="font-semibold">الجهات المانحة</h3>
+                        <p class="text-sm text-gray-600">3 جهات مانحة</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                    <span class="text-2xl">👥</span>
+                    <div>
+                        <h3 class="font-semibold">أعضاء مجلس الإدارة</h3>
+                        <p class="text-sm text-gray-600">5 أعضاء</p>
+                    </div>
+                </div>
+            </div>
+
+            <button
+                id="seedBtn"
+                onclick="runSeed()"
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-all transform hover:scale-105">
+                🚀 بدء إضافة البيانات
+            </button>
+
+            <div id="output" class="mt-6 p-4 bg-gray-900 text-green-400 rounded-lg font-mono text-sm h-96 overflow-y-auto hidden"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        const { createClient } = supabase;
+
+        // Initialize Supabase client
+        const supabaseClient = createClient(
+            'https://dihtjatqgwyyuvilacdd.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpaHRqYXRxZ3d5eXV2aWxhY2RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTc0MDMsImV4cCI6MjA3OTU5MzQwM30.Ck7mKYM5g44SF4S3JkIjqpOWx6u582R9KCxqGLaIJ9A'
+        );
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            output.classList.remove('hidden');
+            const timestamp = new Date().toLocaleTimeString('ar-SA');
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '📝';
+            output.innerHTML += `[${timestamp}] ${icon} ${message}\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function createSamplePDF(title) {
+            const pdfContent = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/Resources <<
+/Font <<
+/F1 <<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+>>
+>>
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 44
+>>
+stream
+BT
+/F1 12 Tf
+100 700 Td
+(${title}) Tj
+ET
+endstream
+endobj
+xref
+0 5
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000115 00000 n
+0000000317 00000 n
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+410
+%%EOF`;
+
+            return new Blob([pdfContent], { type: 'application/pdf' });
+        }
+
+        async function uploadFileToStorage(file, folder, fileName) {
+            const filePath = `${folder}/${fileName}`;
+
+            const { data, error } = await supabaseClient.storage
+                .from('attachments')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true,
+                });
+
+            if (error) throw error;
+
+            const { data: { publicUrl } } = supabaseClient.storage
+                .from('attachments')
+                .getPublicUrl(filePath);
+
+            return publicUrl;
+        }
+
+        async function seedPolicyManuals() {
+            log('🌱 إضافة السياسات والأدلة...');
+
+            const policies = [
+                { name: 'سياسة الموارد البشرية', year: '2024', notes: 'سياسة شاملة لإدارة الموارد البشرية' },
+                { name: 'دليل الإجراءات المالية', year: '2024', notes: 'دليل شامل للإجراءات المالية والمحاسبية' },
+                { name: 'سياسة المشتريات والعقود', year: '2023', notes: 'سياسة تنظيم عمليات المشتريات والعقود' },
+            ];
+
+            for (const policy of policies) {
+                try {
+                    const pdfBlob = createSamplePDF(policy.name);
+                    const fileName = `${Date.now()}-${policy.name.replace(/\s+/g, '_')}.pdf`;
+
+                    const fileUrl = await uploadFileToStorage(pdfBlob, 'policies', fileName);
+
+                    const { error } = await supabaseClient
+                        .from('policy_manuals')
+                        .insert([{
+                            name: policy.name,
+                            year: policy.year,
+                            notes: policy.notes,
+                            issue_date: new Date().toISOString().split('T')[0],
+                            attachment_name: fileName,
+                            attachment_url: fileUrl,
+                            attachment_type: 'application/pdf'
+                        }]);
+
+                    if (error) throw error;
+                    log(`تمت إضافة: ${policy.name}`, 'success');
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
+                } catch (error) {
+                    log(`فشل إضافة: ${policy.name} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function seedCorrespondence() {
+            log('🌱 إضافة المراسلات...');
+
+            const correspondences = [
+                { type: 'Outgoing', title: 'طلب تمويل مشروع', entity: 'وزارة التخطيط', serialNumber: 'OUT-2024-0001', sequence: 1 },
+                { type: 'Incoming', title: 'موافقة على المشروع', entity: 'الجهة المانحة', serialNumber: 'IN-2024-0001', sequence: 1 },
+                { type: 'Outgoing', title: 'تقرير الإنجاز الربع سنوي', entity: 'الجهة المانحة', serialNumber: 'OUT-2024-0002', sequence: 2 },
+            ];
+
+            for (const corr of correspondences) {
+                try {
+                    const pdfBlob = createSamplePDF(corr.title);
+                    const fileName = `${Date.now()}-${corr.serialNumber}.pdf`;
+
+                    const fileUrl = await uploadFileToStorage(pdfBlob, 'correspondence', fileName);
+
+                    const { error } = await supabaseClient
+                        .from('correspondence')
+                        .insert([{
+                            type: corr.type,
+                            title: corr.title,
+                            entity: corr.entity,
+                            date: new Date().toISOString().split('T')[0],
+                            serial_number: corr.serialNumber,
+                            sequence: corr.sequence,
+                            year: 2024,
+                            attachment_name: fileName,
+                            attachment_url: fileUrl,
+                            attachment_type: 'application/pdf'
+                        }]);
+
+                    if (error) throw error;
+                    log(`تمت إضافة: ${corr.title}`, 'success');
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                } catch (error) {
+                    log(`فشل إضافة: ${corr.title} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function seedDepartments() {
+            log('🌱 إضافة الأقسام...');
+
+            const departments = [
+                { name_ar: 'الإدارة العامة', name_en: 'General Management' },
+                { name_ar: 'الموارد البشرية', name_en: 'Human Resources' },
+                { name_ar: 'المالية والمحاسبة', name_en: 'Finance and Accounting' },
+                { name_ar: 'المشاريع', name_en: 'Projects' },
+                { name_ar: 'المشتريات', name_en: 'Procurement' },
+            ];
+
+            for (const dept of departments) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('departments')
+                        .insert([dept]);
+
+                    if (error) throw error;
+                    log(`تمت إضافة: ${dept.name_ar}`, 'success');
+                } catch (error) {
+                    log(`فشل إضافة: ${dept.name_ar} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function seedDonors() {
+            log('🌱 إضافة الجهات المانحة...');
+
+            const donors = [
+                { name_ar: 'البنك الدولي', name_en: 'World Bank', country: 'USA', contact_person: 'John Smith', email: 'john@worldbank.org', phone: '+1234567890' },
+                { name_ar: 'الاتحاد الأوروبي', name_en: 'European Union', country: 'Belgium', contact_person: 'Marie Dupont', email: 'marie@eu.org', phone: '+32123456789' },
+                { name_ar: 'الوكالة الأمريكية للتنمية', name_en: 'USAID', country: 'USA', contact_person: 'Sarah Johnson', email: 'sarah@usaid.gov', phone: '+1987654321' },
+            ];
+
+            for (const donor of donors) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('donors')
+                        .insert([donor]);
+
+                    if (error) throw error;
+                    log(`تمت إضافة: ${donor.name_ar}`, 'success');
+                } catch (error) {
+                    log(`فشل إضافة: ${donor.name_ar} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function seedBoardMembers() {
+            log('🌱 إضافة أعضاء مجلس الإدارة...');
+
+            const members = [
+                { full_name: 'أحمد محمد علي', id_number: '1234567890', nationality: 'سعودي', position: 'رئيس مجلس الإدارة', phone: '0501234567', email: 'ahmed@example.com' },
+                { full_name: 'فاطمة حسن', id_number: '0987654321', nationality: 'سعودية', position: 'نائب الرئيس', phone: '0509876543', email: 'fatima@example.com' },
+                { full_name: 'خالد عبدالله', id_number: '1122334455', nationality: 'سعودي', position: 'عضو', phone: '0501122334', email: 'khaled@example.com' },
+                { full_name: 'نورة سعيد', id_number: '5544332211', nationality: 'سعودية', position: 'عضو', phone: '0505544332', email: 'noura@example.com' },
+                { full_name: 'عمر يوسف', id_number: '6677889900', nationality: 'سعودي', position: 'عضو', phone: '0506677889', email: 'omar@example.com' },
+            ];
+
+            for (const member of members) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('master_board_members')
+                        .insert([member]);
+
+                    if (error) throw error;
+                    log(`تمت إضافة: ${member.full_name}`, 'success');
+                } catch (error) {
+                    log(`فشل إضافة: ${member.full_name} - ${error.message}`, 'error');
+                }
+            }
+        }
+
+        window.runSeed = async function() {
+            const btn = document.getElementById('seedBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ جاري الإضافة...';
+
+            const output = document.getElementById('output');
+            output.innerHTML = '';
+            output.classList.remove('hidden');
+
+            try {
+                log('🚀 بدء عملية إضافة البيانات...\n');
+
+                await seedPolicyManuals();
+                log('');
+
+                await seedCorrespondence();
+                log('');
+
+                await seedDepartments();
+                log('');
+
+                await seedDonors();
+                log('');
+
+                await seedBoardMembers();
+                log('');
+
+                log('✅ تمت إضافة جميع البيانات بنجاح!', 'success');
+                btn.textContent = '✅ تمت الإضافة بنجاح';
+                btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                btn.classList.add('bg-green-600');
+            } catch (error) {
+                log(`❌ فشلت العملية: ${error.message}`, 'error');
+                btn.disabled = false;
+                btn.textContent = '🚀 إعادة المحاولة';
+            }
+        };
+    </script>
+</body>
+</html>

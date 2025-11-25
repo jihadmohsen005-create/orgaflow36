@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار رفع ملف - Supabase Storage</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: #f8f9ff;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .file-label {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .file-label:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .file-name {
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        .result.success {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+            display: block;
+        }
+        .result.error {
+            background: #fee2e2;
+            border: 2px solid #ef4444;
+            color: #991b1b;
+            display: block;
+        }
+        .result h3 {
+            margin-bottom: 10px;
+        }
+        .result pre {
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 اختبار رفع ملف إلى Supabase Storage</h1>
+        
+        <div class="upload-area">
+            <label for="fileInput" class="file-label">
+                📁 اختر ملف للرفع
+            </label>
+            <input type="file" id="fileInput" accept="*/*">
+            <div class="file-name" id="fileName">لم يتم اختيار ملف</div>
+        </div>
+
+        <button id="uploadBtn" disabled>📤 رفع الملف</button>
+        
+        <div class="loader" id="loader"></div>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script type="module">
+        const { createClient } = supabase;
+
+        // Initialize Supabase
+        const supabaseClient = createClient(
+            'https://dihtjatqgwyyuvilacdd.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpaHRqYXRxZ3d5eXV2aWxhY2RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTc0MDMsImV4cCI6MjA3OTU5MzQwM30.Ck7mKYM5g44SF4S3JkIjqpOWx6u582R9KCxqGLaIJ9A'
+        );
+
+        let selectedFile = null;
+
+        // File selection
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                document.getElementById('fileName').textContent = `✅ ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)`;
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        });
+
+        // Upload function
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            const loader = document.getElementById('loader');
+            const result = document.getElementById('result');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            loader.style.display = 'block';
+            result.style.display = 'none';
+            uploadBtn.disabled = true;
+
+            try {
+                const timestamp = Date.now();
+                const sanitizedFileName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const fileName = `test-${timestamp}-${sanitizedFileName}`;
+                const filePath = `test/${fileName}`;
+
+                console.log('🔄 بدء رفع الملف:', filePath);
+                console.log('📁 حجم الملف:', selectedFile.size, 'bytes');
+                console.log('📝 نوع الملف:', selectedFile.type);
+
+                // Add timeout to detect hanging
+                const uploadPromise = supabaseClient.storage
+                    .from('attachments')
+                    .upload(filePath, selectedFile, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('انتهت مهلة الرفع (30 ثانية)')), 30000)
+                );
+
+                const { data, error } = await Promise.race([uploadPromise, timeoutPromise]);
+
+                console.log('📊 نتيجة الرفع:', { data, error });
+
+                if (error) {
+                    console.error('❌ خطأ من Supabase:', error);
+                    throw error;
+                }
+
+                const { data: { publicUrl } } = supabaseClient.storage
+                    .from('attachments')
+                    .getPublicUrl(filePath);
+
+                result.className = 'result success';
+                result.innerHTML = `
+                    <h3>✅ تم رفع الملف بنجاح!</h3>
+                    <p><strong>المسار:</strong> ${data.path}</p>
+                    <p><strong>الرابط:</strong></p>
+                    <pre>${publicUrl}</pre>
+                    <p style="margin-top: 15px;">
+                        <a href="${publicUrl}" target="_blank" style="color: #059669; text-decoration: underline;">
+                            🔗 فتح الملف في نافذة جديدة
+                        </a>
+                    </p>
+                `;
+
+                console.log('✅ نجح الرفع:', data);
+
+            } catch (error) {
+                console.error('❌ خطأ كامل:', error);
+
+                result.className = 'result error';
+                result.innerHTML = `
+                    <h3>❌ فشل رفع الملف</h3>
+                    <p><strong>رسالة الخطأ:</strong></p>
+                    <pre>${error.message || 'خطأ غير معروف'}</pre>
+                    <p style="margin-top: 15px;"><strong>التفاصيل الكاملة:</strong></p>
+                    <pre>${JSON.stringify(error, null, 2)}</pre>
+                    <p style="margin-top: 15px;"><strong>نصيحة:</strong> افتح Console (F12) لمزيد من التفاصيل</p>
+                `;
+            } finally {
+                loader.style.display = 'none';
+                uploadBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
+

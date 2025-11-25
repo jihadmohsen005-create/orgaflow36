@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار Supabase Storage</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .output {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 اختبار Supabase Storage</h1>
+        
+        <div class="test-section">
+            <h3>1️⃣ التحقق من اتصال Supabase</h3>
+            <button onclick="testConnection()">اختبار الاتصال</button>
+            <div id="connection-output" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2️⃣ التحقق من وجود Bucket</h3>
+            <button onclick="checkBucket()">فحص Bucket</button>
+            <div id="bucket-output" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3️⃣ اختبار رفع ملف</h3>
+            <input type="file" id="testFile" accept="*/*">
+            <button onclick="testUpload()">رفع ملف تجريبي</button>
+            <div id="upload-output" class="output"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4️⃣ عرض جميع الملفات</h3>
+            <button onclick="listAllFiles()">عرض الملفات</button>
+            <div id="files-output" class="output"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        const { createClient } = supabase;
+
+        // Initialize Supabase client
+        window.supabaseClient = createClient(
+            'https://dihtjatqgwyyuvilacdd.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpaHRqYXRxZ3d5eXV2aWxhY2RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMTc0MDMsImV4cCI6MjA3OTU5MzQwM30.Ck7mKYM5g44SF4S3JkIjqpOWx6u582R9KCxqGLaIJ9A'
+        );
+
+        function log(elementId, message, type = 'info') {
+            const output = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString('ar-SA');
+            const className = type;
+            output.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+        }
+
+        window.testConnection = async function() {
+            const output = document.getElementById('connection-output');
+            output.innerHTML = '';
+            
+            try {
+                log('connection-output', '🔄 جاري الاتصال بـ Supabase...', 'info');
+                
+                const { data, error } = await window.supabaseClient
+                    .from('users')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                log('connection-output', '✅ الاتصال ناجح!', 'success');
+            } catch (error) {
+                log('connection-output', `❌ فشل الاتصال: ${error.message}`, 'error');
+            }
+        };
+
+        window.checkBucket = async function() {
+            const output = document.getElementById('bucket-output');
+            output.innerHTML = '';
+
+            try {
+                log('bucket-output', '🔄 جاري فحص bucket "attachments"...', 'info');
+
+                // Try to list files in the bucket - if it works, bucket exists
+                const { data, error } = await window.supabaseClient
+                    .storage
+                    .from('attachments')
+                    .list('', {
+                        limit: 1,
+                        offset: 0
+                    });
+
+                if (error) {
+                    if (error.message.includes('Bucket not found')) {
+                        log('bucket-output', '❌ Bucket "attachments" غير موجود!', 'error');
+                        log('bucket-output', 'الرجاء إنشاء Bucket باسم "attachments" في Supabase Dashboard', 'error');
+                    } else {
+                        throw error;
+                    }
+                } else {
+                    log('bucket-output', '✅ Bucket "attachments" موجود!', 'success');
+                    log('bucket-output', `📁 عدد العناصر في المجلد الرئيسي: ${data.length}`, 'info');
+                }
+            } catch (error) {
+                log('bucket-output', `❌ خطأ: ${error.message}`, 'error');
+                console.error('Bucket check error:', error);
+            }
+        };
+
+        window.testUpload = async function() {
+            const output = document.getElementById('upload-output');
+            output.innerHTML = '';
+            
+            const fileInput = document.getElementById('testFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                log('upload-output', '⚠️ الرجاء اختيار ملف أولاً', 'error');
+                return;
+            }
+            
+            try {
+                log('upload-output', `🔄 جاري رفع الملف: ${file.name} (${file.size} bytes)...`, 'info');
+                
+                const timestamp = Date.now();
+                const fileName = `test-${timestamp}-${file.name}`;
+                const filePath = `correspondence/test/${fileName}`;
+                
+                const { data, error } = await window.supabaseClient.storage
+                    .from('attachments')
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+                
+                if (error) throw error;
+                
+                log('upload-output', `✅ تم رفع الملف بنجاح!`, 'success');
+                log('upload-output', `📁 المسار: ${data.path}`, 'info');
+                
+                // Get public URL
+                const { data: { publicUrl } } = window.supabaseClient.storage
+                    .from('attachments')
+                    .getPublicUrl(filePath);
+                
+                log('upload-output', `🔗 URL: ${publicUrl}`, 'info');
+            } catch (error) {
+                log('upload-output', `❌ فشل رفع الملف: ${error.message}`, 'error');
+                console.error('Upload error details:', error);
+            }
+        };
+
+        window.listAllFiles = async function() {
+            const output = document.getElementById('files-output');
+            output.innerHTML = '';
+            
+            try {
+                log('files-output', '🔄 جاري جلب قائمة الملفات...', 'info');
+                
+                const { data, error } = await window.supabaseClient.storage
+                    .from('attachments')
+                    .list('', {
+                        limit: 100,
+                        offset: 0
+                    });
+                
+                if (error) throw error;
+                
+                log('files-output', `📁 عدد المجلدات/الملفات: ${data.length}`, 'info');
+                data.forEach(item => {
+                    log('files-output', `  - ${item.name}`, 'info');
+                });
+            } catch (error) {
+                log('files-output', `❌ خطأ: ${error.message}`, 'error');
+            }
+        };
+    </script>
+</body>
+</html>
+

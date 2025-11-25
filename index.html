@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 5C25.1472 5 5 25.1472 5 50C5 74.8528 25.1472 95 50 95C74.8528 95 95 74.8528 95 50' stroke='rgb(79, 70, 229)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M95 50C95 25.1472 74.8528 5 50 5' stroke='rgb(129, 140, 248)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' stroke-dasharray='15 15'/%3E%3Cpath d='M30 70L70 30' stroke='rgb(79, 70, 229)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' /%3E%3Cpath d='M30 30H70' stroke='rgb(129, 140, 248)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' /%3E%3Cpath d='M30 50H70' stroke='rgb(99, 102, 241)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' /%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OrgaFlow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Cairo', 'sans-serif'],
+            },
+          },
+        },
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700;800&display=swap');
+      body {
+        font-family: 'Cairo', sans-serif;
+        background-color: #f8fafc; /* bg-slate-50 */
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root">
+      <!-- Loading indicator -->
+      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; font-family: 'Cairo', sans-serif;">
+        <div style="width: 80px; height: 80px; border: 8px solid #e2e8f0; border-top: 8px solid #4f46e5; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top: 20px; font-size: 18px; color: #64748b;">جاري تحميل OrgaFlow...</p>
+        <p style="margin-top: 10px; font-size: 14px; color: #94a3b8;">الرجاء الانتظار</p>
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    </div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
